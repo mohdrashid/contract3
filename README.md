@@ -10,7 +10,7 @@ Tested with Node 8.0 and web3 version 1.0
 
 # Class functions
 
-##constructor(web3)
+## constructor(web3)
 Constructor takes web3 object as argument
 
 ## compile(source)
@@ -19,18 +19,31 @@ Compiles and returns bytes code and other details as produced by solc
 ## deploy(source)
 Compiles and returns instances of the the contracts
 
-## Contract Instance methods
+# Contract Instance methods
+
+## constructor(web3, abi, code)
+Constructor takes in web3 instance, abi interface and code as parameter. Automatically taken care of when deploying 
+
+## deployContract(args, from, value, options)
+Deploys the contract and creates an instances using args passed as array. From is address of the deployer. Value is the ether value to send to if the constructor is payable. Options are options related to gas and gasPrce.
 
 
+## get(functionName,args,from) 
+A getter function that issue a call to function represented by functionName by passing the arguments given in array format. From is address of the deployer.
+
+## set(functionName,args,from, value)
+A setter function that should be called when modifications in blockchain. Issues a send to function represented by functionName by passing the arguments given in array format. From is address of the deployer. Value is the ether value to send to if the function is payable.
 
 
 # Example
 `
 var Web3 = require('web3');
+
 const config = {
     host: 'localhost',
     port: 8545
 };
+
 var web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.host+":"+config.port));
 var web3 = require('./web3_client');
 var Contract3 = require('contract3');

@@ -69,13 +69,9 @@ module.exports = class Contract {
      * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    get(functionName,args,from, value){
+    get(functionName,args,from){
         let sendParmas = {
             from: from
-        }
-
-        if(value!==undefined && value>0){
-            sendParmas['value'] = value;
         }
 
         return this.instance.methods[functionName].apply(null, args).call(sendParmas);
