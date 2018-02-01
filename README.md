@@ -44,9 +44,8 @@ Compiles and returns instances of the the contracts
 
 ## constructor(web3, abi, code)
 Constructor takes in web3 instance, abi interface and code as parameter. Automatically taken care of when deploying 
-```javascript
 
-```
+
 ## deployContract(args, from, value, options)
 Deploys the contract and creates an instances using args passed as array. From is address of the deployer. Value is the ether value to send to if the constructor is payable. Options are options related to gas and gasPrce.
 ```javascript
