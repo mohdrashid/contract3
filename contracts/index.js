@@ -56,6 +56,7 @@ module.exports = class Contract {
             })
             .on('error', (error) => reject)
             .on('confirmation', (confirmationNumber, receipt) => { 
+                this.receipt = receipt;
                 this.instance.options.address = receipt.contractAddress;
                 resolve(this.instance);
              });
@@ -100,9 +101,9 @@ module.exports = class Contract {
                 }
             })
             .on('confirmation', (confirmationNumber, receipt) => { 
-                resolve(true);
+                resolve(receipt);
              })
-             .on('error', reject)
+            .on('error', reject)
         })
     }
 }
