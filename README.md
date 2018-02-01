@@ -131,17 +131,21 @@ async function deploy(){
             {
                 gas:4712388
             });
-        console.log('Contract Address: ',ContractObject.options.address)
-        const result = await AssetInstance.get('getValue',[],defaultAccount);
-        console.log(result)
-        const result2 = await contracts.set(ContractObject,'set', [134],defaultAccount);
-        if (result2) {
-            const result = await contracts.get(ContractObject,'get',[],defaultAccount);
-            console.log(result)
-        }
+            console.log('Contract Address:',ContractObject.options.address)
+            const result = await AssetInstance.get('getValue',[],defaultAccount);
+            console.log('Value of Asset:', result)
+            console.log('Changing Asset Value')
+            const result2 = await AssetInstance.set('changeValue', [134],defaultAccount);
+            if (result2) {
+                const result = await AssetInstance.get('getValue',[],defaultAccount);
+                console.log('New Asset Value:', result)
+            }
     } catch(e){
         console.log(e)
     }
 }
 deploy();
 ```
+
+# Full example
+To see a full example visit [link](https://github.com/mohdrashid/ethereum_asset_exchange_example)sss
