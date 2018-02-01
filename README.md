@@ -20,7 +20,7 @@ var contract3 = new Contract3(web3)
 Compiles and returns bytes code and other details as produced by solc
 ```javascript
     let Administered = 'contract Administered { .. }';
-    let Asset = 'contract Asset { .. };
+    let Asset = 'contract Asset { .. }';
     let input = {
         'Administered.sol': Administered,
         'Asset.sol': Asset
@@ -32,7 +32,7 @@ Compiles and returns bytes code and other details as produced by solc
 Compiles and returns instances of the the contracts
 ```javascript
     let Administered = 'contract Administered { .. }';
-    let Asset = 'contract Asset { .. };
+    let Asset = 'contract Asset { .. }';
     let input = {
         'Administered.sol': Administered,
         'Asset.sol': Asset
@@ -51,7 +51,7 @@ Constructor takes in web3 instance, abi interface and code as parameter. Automat
 Deploys the contract and creates an instances using args passed as array. From is address of the deployer. Value is the ether value to send to if the constructor is payable. Options are options related to gas and gasPrce.
 ```javascript
     let Administered = 'contract Administered { .. }';
-    let Asset = 'contract Asset { .. };
+    let Asset = 'contract Asset { .. }';
     let input = {
         'Administered.sol': Administered,
         'Asset.sol': Asset
@@ -110,7 +110,7 @@ var contract3 = new Contract3(web3);
 
 async function deploy(){
     let Administered = 'contract Administered { .. }';
-    let Asset = 'contract Asset { .. };
+    let Asset = 'contract Asset { .. }';
     let input = {
         'Administered.sol': Administered,
         'Asset.sol': Asset
