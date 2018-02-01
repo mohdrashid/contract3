@@ -8,8 +8,22 @@ module.exports = class Contract {
      */
     constructor(web3, abi, code){
         this.web3 = web3;
-        this.instance = this.web3.eth.Contract(abi);
+        this.instance = new this.web3.eth.Contract(abi);
         this.code = code;
+    }
+
+    /**
+     * Returns the bytecode
+     */
+    getCode(){
+        return this.code;
+    }
+
+    /**
+     * Retutns the instance
+     */
+    getInstance() {
+        return this.instance;
     }
 
     /**
@@ -31,12 +45,15 @@ module.exports = class Contract {
         if(value!==undefined && value>0){
             sendParmas['value'] = value;
         }
-        
         return new Promise((resolve,reject) => {
             this.instance.deploy({
                 data: this.code,
                 arguments: args
-            }).send(sendParmas, (error, transactionHash) => {  })
+            }).send(sendParmas, (error, transactionHash) => { 
+                if(error){
+                    reject(error)
+                }
+            })
             .on('error', (error) => reject)
             .on('confirmation', (confirmationNumber, receipt) => { 
                 this.instance.options.address = receipt.contractAddress;
@@ -52,7 +69,7 @@ module.exports = class Contract {
      * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    async get(functionName,args,from, value){
+    get(functionName,args,from, value){
         let sendParmas = {
             from: from
         }
@@ -61,7 +78,7 @@ module.exports = class Contract {
             sendParmas['value'] = value;
         }
 
-        return await this.instance.methods[functionName].apply(null, args).call(sendParmas);
+        return this.instance.methods[functionName].apply(null, args).call(sendParmas);
     }
 
     /**
@@ -71,7 +88,7 @@ module.exports = class Contract {
      * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    async set(functionName,args,from, value){
+    set(functionName,args,from, value){
         let sendParmas = {
             from: from
         }
@@ -81,7 +98,11 @@ module.exports = class Contract {
         }
 
         return new Promise((resolve,reject)=>{
-            this.instance.methods[functionName].apply(null,args).send(sendParmas)
+            this.instance.methods[functionName].apply(null,args).send(sendParmas,(error, transactionHash) => { 
+                if(error){
+                    reject(error)
+                }
+            })
             .on('confirmation', (confirmationNumber, receipt) => { 
                 resolve(true);
              })

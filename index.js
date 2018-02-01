@@ -1,5 +1,5 @@
 const solc = require('solc');
-const Contract = require('./contract');
+const Contract = require('./contracts');
 
 module.exports = class contract3{
 
@@ -16,9 +16,7 @@ module.exports = class contract3{
      * @param {*} source 
      */
     compile(source) {
-        return solc.compile(
-            {sources: source}, 1
-        );
+        return solc.compile({sources: source}, 1);
     }
     
     /**
@@ -30,14 +28,14 @@ module.exports = class contract3{
      * }
      */
     getInstances (source) {
-        const compiled = this.compile(this.web3, source)['contracts'];
+        const compiled = this.compile(source)['contracts'];
         let compiledInstances = {};
         for(var i in compiled){
             const name = i.split(':')[1];
             const abi = JSON.parse(compiled[i]['interface']);
 
             compiledInstances[name] = new Contract(
-                web3,
+                this.web3,
                 abi,
                 compiled[i]['bytecode']
             )
