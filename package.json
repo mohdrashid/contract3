@@ -1,0 +1,30 @@
+{
+  "name": "easy-web3",
+  "version": "1.0.0",
+  "description": "A plugin making smart contract compilation, deployment and interaction easier",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohammed Rashid",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohdrashid/easy-web3.git"
+  },
+  "keywords": [
+    "web3",
+    "easy",
+    "smart",
+    "contract",
+    "blockchain",
+    "ethereum"
+  ],
+  "bugs": {
+    "url": "https://github.com/mohdrashid/easy-web3/issues"
+  },
+  "homepage": "https://github.com/mohdrashid/easy-web3#readme",
+  "dependencies": {
+    "solc": "^0.4.19"
+  }
+}
