@@ -2,20 +2,30 @@
 
 Go to the project directory and type
 
-`npm install --save easy-web3`
+`npm install --save contract3`
 
 # Requirements
 
 Tested with Node 8.0 and web3 version 1.0
 
-# APIs
+# Class functions
 
-# compile(source file)
+##constructor(web3)
+Constructor takes web3 object as argument
+
+## compile(source)
+Compiles and returns bytes code and other details as produced by solc
+
+## deploy(source)
+Compiles and returns instances of the the contracts
+
+## Contract Instance methods
+
+
 
 
 # Example
 `
-
 var Web3 = require('web3');
 const config = {
     host: 'localhost',
