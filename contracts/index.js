@@ -10,6 +10,7 @@ module.exports = class Contract {
         this.web3 = web3;
         this.instance = new this.web3.eth.Contract(abi);
         this.code = code;
+        this.receipt = undefined;
     }
 
     /**
@@ -24,6 +25,13 @@ module.exports = class Contract {
      */
     getInstance() {
         return this.instance;
+    }
+
+    /**
+     * Returns deployment transaction receipt
+     */
+    getReceipt(){
+        return this.receipt;
     }
 
     /**

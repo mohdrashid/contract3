@@ -93,6 +93,17 @@ A setter function that should be called when modifications in blockchain. Issues
     }
 ```
 
+Returns transaction reciept
+
+## getReceipt()
+Returns transaction receipt assosciated with contract deployment
+
+## getCode()
+Returns bytecode of the contract
+
+## getInstance()
+Returns web3 contract instance of the instance
+
 # Example
 ```javascript
 var Web3 = require('web3');
@@ -148,4 +159,4 @@ deploy();
 ```
 
 # Full example
-To see a full example visit [link](https://github.com/mohdrashid/ethereum_asset_exchange_example)sss
+To see a full example visit [link](https://github.com/mohdrashid/ethereum_asset_exchange_example)
