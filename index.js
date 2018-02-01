@@ -1,7 +1,7 @@
 const solc = require('solc');
 const Contract = require('./contract');
 
-module.exports = class Easy_Web3{
+module.exports = class contract3{
 
     /**
      * Takes in web3 instance

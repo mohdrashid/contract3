@@ -1,5 +1,5 @@
 {
-  "name": "easy-web3",
+  "name": "contract3",
   "version": "1.0.0",
   "description": "A plugin making smart contract compilation, deployment and interaction easier",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mohdrashid/easy-web3.git"
+    "url": "git+https://github.com/mohdrashid/contract3.git"
   },
   "keywords": [
     "web3",
@@ -21,9 +21,9 @@
     "ethereum"
   ],
   "bugs": {
-    "url": "https://github.com/mohdrashid/easy-web3/issues"
+    "url": "https://github.com/mohdrashid/contract3/issues"
   },
-  "homepage": "https://github.com/mohdrashid/easy-web3#readme",
+  "homepage": "https://github.com/mohdrashid/contract3#readme",
   "dependencies": {
     "solc": "^0.4.19"
   }
