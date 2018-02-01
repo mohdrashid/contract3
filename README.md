@@ -15,25 +15,20 @@ Tested with Node 8.0 and web3 version 1.0
 
 # Example
 `
-var Web3 = require('web3');
 
+var Web3 = require('web3');
 const config = {
     host: 'localhost',
     port: 8545
 };
-
 var web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.host+":"+config.port));
-
 var web3 = require('./web3_client');
 var Contract3 = require('contract3');
 var contract3 = new Contract3(web3);
 
-
-
 async function deploy(){
     let Administered = 'contract Administered { .. }';
     let Asset = 'contract Asset { .. };
-
     let input = {
         'Administered.sol': Administered,
         'Asset.sol': Asset
@@ -64,8 +59,5 @@ async function deploy(){
     } catch(e){
         console.log(e)
     }
-
 }
-
-deploy();
-`
+deploy();`
