@@ -78,6 +78,13 @@ Deploys the contract and creates an instances using args passed as array. From i
     }
 ```
 
+## setAddress(address)
+A setter function that sets the address of the instance to call functions of an already deployed contracts
+```javascript
+    const AssetInstance = contractInstances['Asset'];
+    AssetInstance.setAddress('0x234924...');
+```
+
 ## get(functionName,args,from) 
 A getter function that issue a call to function represented by functionName by passing the arguments given in array format. From is address of the deployer.
 ```javascript

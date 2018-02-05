@@ -72,6 +72,14 @@ module.exports = class Contract {
     }
 
     /**
+     * A setter function to set address of an already deployed contract
+     * @param {*} address : Address of the deployed contract
+     */
+    setAddress(address){
+        this.instance.options.address = address;
+    }
+
+    /**
      * A getter interface for contract functions/public variables
      * @param {*} functionName : The name of the function or variable name
      * @param {*} args : Arguments to pass to function if any
