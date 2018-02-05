@@ -29,16 +29,19 @@ module.exports = class contract3{
      */
     getInstances (source) {
         const compiled = this.compile(source)['contracts'];
+        const Web3 = this.web3;
+
         let compiledInstances = {};
         for(var i in compiled){
             const name = i.split(':')[1];
             const abi = JSON.parse(compiled[i]['interface']);
-
-            compiledInstances[name] = new Contract(
-                this.web3,
+            compiledInstances[name] = function () {
+                return new Contract(
+                Web3,
                 abi,
                 compiled[i]['bytecode']
-            )
+                )
+            }
         };    
         return compiledInstances;
     }

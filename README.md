@@ -38,6 +38,8 @@ Compiles and returns instances of the the contracts
         'Asset.sol': Asset
     }
     const contractInstances = await contract3.getInstances(input);
+    //Getting a contract instance by name of the smart contract
+    const Asset = contractInstances['Asset'];
 ```
 
 # Contract Instance methods
@@ -128,10 +130,12 @@ async function deploy(){
 
     const defaultAccount = await web3.eth.getCoinbase();
     const contractInstances = await contract3.getInstances(input);
-    const AssetInstance = contractInstances['Asset'];
+    //Getting instance of the contract, by Contract name
+    const AssetInstance = contractInstances['Asset']();
 
     try{
-        const ContractObject = await AssetInstance.deployContract(
+
+        const ContractDeploymentResponse = await AssetInstance.deployContract(
             //args to constuctor
             ["computerSystem",defaultAccount,100],
             //deployer
@@ -142,7 +146,7 @@ async function deploy(){
             {
                 gas:4712388
             });
-            console.log('Contract Address:',ContractObject.options.address)
+            console.log('Contract Address:',ContractDeploymentResponse.options.address)
             const result = await AssetInstance.get('getValue',[],defaultAccount);
             console.log('Value of Asset:', result)
             console.log('Changing Asset Value')
