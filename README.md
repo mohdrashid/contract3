@@ -92,10 +92,10 @@ A getter function that issue a call to function represented by functionName by p
     console.log(result)
 ```
 
-## set(functionName,args,from, value)
+## set(functionName,args,from, value, options)
 A setter function that should be called when modifications in blockchain. Issues a send to function represented by functionName by passing the arguments given in array format. From is address of the deployer. Value is the ether value to send along if the function is payable.
 ```javascript
-    const result2 = await contracts.set(ContractObject,'set', [134],'0x12323....', 0);
+    const result2 = await contracts.set(ContractObject,'set', [134],'0x12323....', 0,{gas: 100000});
     if (result2) {
         const result = await contracts.get(ContractObject,'get',[],'0x12323....');
         console.log(result)

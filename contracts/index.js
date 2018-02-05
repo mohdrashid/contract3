@@ -101,9 +101,13 @@ module.exports = class Contract {
      * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    set(functionName,args,from, value){
+    set(functionName,args,from, value, options){
         let sendParmas = {
             from: from
+        }
+
+        for(let key in options){
+            sendParmas[key] = options[key];
         }
 
         if(value!==undefined && value>0){
