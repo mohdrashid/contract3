@@ -58,7 +58,7 @@ Deploys the contract and creates an instances using args passed as array. From i
         'Asset.sol': Asset
     }
     const contractInstances = await contract3.getInstances(input);
-    const AssetInstance = contractInstances['Asset'];
+    const AssetInstance = contractInstances['Asset']();
     try{
         const ContractObject = await AssetInstance.deployContract(
             //args to constuctor
