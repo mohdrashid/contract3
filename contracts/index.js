@@ -80,6 +80,14 @@ module.exports = class Contract {
     }
 
     /**
+     * A setter function to be used if the contract ABI is available
+     * @param {*} abi : ABI of the contract
+     */
+    setAbi(abi){
+        this.instance = new this.web3.eth.Contract(abi);      
+    }
+
+    /**
      * A getter interface for contract functions/public variables
      * @param {*} functionName : The name of the function or variable name
      * @param {*} args : Arguments to pass to function if any

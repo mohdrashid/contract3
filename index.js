@@ -40,10 +40,19 @@ module.exports = class contract3{
                 Web3,
                 abi,
                 compiled[i]['bytecode']
-                )
+                );
             }
         };    
         return compiledInstances;
+    }
+
+    getInstance (abi, address) {
+        Contract c = new Contract(
+            Web3,
+            abi,
+            '');
+        c.setAddress(address);
+        return c;
     }
 };
 

@@ -42,6 +42,13 @@ Compiles and returns instances of the the contracts
     const Asset = contractInstances['Asset'];
 ```
 
+## getInstance(abi,address)
+```javascript
+    const abi ={..};
+    const address='0xad12313...';
+    const contractInstance = await contract3.getInstance(abi,address);
+
+```
 # Contract Instance methods
 
 ## constructor(web3, abi, code)
