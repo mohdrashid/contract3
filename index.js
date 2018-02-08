@@ -48,7 +48,7 @@ module.exports = class contract3{
 
     getInstance (abi, address) {
         let c = new Contract(
-            Web3,
+            this.web3,
             abi,
             '');
         c.setAddress(address);
