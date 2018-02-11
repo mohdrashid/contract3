@@ -5,10 +5,12 @@ module.exports = class contract3{
 
     /**
      * Takes in web3 instance
-     * @param {*} web3 
+     * @param {*} web3 : web3 instance
+     * @param {*} isQuorum : Checks if it a quorum implementation
      */
-    constructor(web3){
+    constructor(web3, isQuorum){
         this.web3 = web3;
+        this.isQuorum = isQuorum;
     }
 
     /**
@@ -30,6 +32,7 @@ module.exports = class contract3{
     getInstances (source) {
         const compiled = this.compile(source)['contracts'];
         const Web3 = this.web3;
+        const IsQuorum = this.isQuorum;
 
         let compiledInstances = {};
         for(var i in compiled){
@@ -39,7 +42,8 @@ module.exports = class contract3{
                 return new Contract(
                 Web3,
                 abi,
-                compiled[i]['bytecode']
+                compiled[i]['bytecode'],
+                IsQuorum
                 );
             }
         };    

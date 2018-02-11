@@ -10,10 +10,10 @@ Tested with Node 8.0 and web3 version 1.0
 
 # Class functions
 
-## constructor(web3)
-Constructor takes web3 object as argument
+## constructor(web3, isQuorum)
+Constructor takes web3 object as argument and check if it is a quorum implementation
 ```javascript
-var contract3 = new Contract3(web3)
+var contract3 = new Contract3(web3, true)
 ```
 
 ## compile(source)
@@ -51,8 +51,8 @@ Compiles and returns instances of the the contracts
 ```
 # Contract Instance methods
 
-## constructor(web3, abi, code)
-Constructor takes in web3 instance, abi interface and code as parameter. Automatically taken care of when deploying 
+## constructor(web3, abi, code, isQuorum)
+Constructor takes in web3 instance, abi interface and code as parameter. There is also a parameter to check if this is a quorum implementation. Automatically taken care of when deploying 
 
 
 ## deployContract(args, from, value, options)

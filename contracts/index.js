@@ -5,11 +5,12 @@ module.exports = class Contract {
      * @param {*} web3 : An instance of web3
      * @param {*} abi : ABI of the contract
      * @param {*} code : Byte code of the contract
+     * @param {*} isQuorum : Check if it ethereum mainpnet or quorum implementation
      */
-    constructor(web3, abi, code){
+    constructor(web3, abi, code, isQuorum){
         this.web3 = web3;
         this.instance = new this.web3.eth.Contract(abi);
-        this.code = code;
+        this.code = isQuorum? ('0x'+code) : code;
         this.receipt = undefined;
     }
 
