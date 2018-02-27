@@ -37,12 +37,13 @@ module.exports = class contract3{
         let compiledInstances = {};
         for(var i in compiled){
             const name = i.split(':')[1];
+            const bytecode = compiled[i]['bytecode'];
             const abi = JSON.parse(compiled[i]['interface']);
             compiledInstances[name] = function () {
                 return new Contract(
                 Web3,
                 abi,
-                compiled[i]['bytecode'],
+                bytecode,
                 IsQuorum
                 );
             }
