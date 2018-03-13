@@ -22,17 +22,15 @@ module.exports = class contract3 {
 
   /**
    *
-   * @param {*} web3 : Web3 client
    * @param {*} abi : Abi of the contract
    * @param {*} code : bytecode of the contract
-   * @param {*} isQuorum : true or false based on whether the system is Quorum or Ethereum
    * @param {*} args : Constructor arguments of the smart contract
    * @param {*} from : Sender address
    * @param {*} value : Ether to be send along with if any
    * @param {*} options : Other options like privateFor, gas, gasPrice, etc
    */
-  deploy(web3, abi, code, isQuorum, args, from, value, options) {
-    var contract = new Contract(web3, abi, bytecode, IsQuorum);
+  deploy(abi, code, args, from, value, options) {
+    var contract = new Contract(this.web3, abi, bytecode, this.isQuorum);
     return new Promise(function(resolve, reject) {
       contract
         .deployContract(args, from, value, options)

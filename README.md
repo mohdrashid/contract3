@@ -28,10 +28,10 @@ Compiles and returns bytes code and other details as produced by solc
     contract3.compile(input)
 ```
 
-## deploy(web3, abi, code, isQuorum, args, from, value, options)
+## deploy(abi, code, args, from, value, options)
 Deploys a existing compiled smart contract. Returns promise containing the receipt and transaction hash of deployed smart contract
 ```javascript
-    contract3.deploy(web3, [...], '0x45..', true, ['1'], '0x12d..', 0, {
+    contract3.deploy([...], '0x45..', ['1'], '0x12d..', 0, {
         gas:4712388,
         privateFor: []
     })
