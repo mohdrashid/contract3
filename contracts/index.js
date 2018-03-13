@@ -12,6 +12,7 @@ module.exports = class Contract {
         this.instance = new this.web3.eth.Contract(abi);
         this.code = isQuorum? ('0x'+code) : code;
         this.receipt = undefined;
+        this.transactionHash = undefined;
     }
 
     /**
@@ -33,6 +34,13 @@ module.exports = class Contract {
      */
     getReceipt(){
         return this.receipt;
+    }
+
+    /**
+     * Returns the transaction hash during the deployment of contract
+     */
+    getTransactionHash() {
+        return this.transactionHash;
     }
 
     /**
@@ -62,6 +70,7 @@ module.exports = class Contract {
                 if(error){
                     reject(error)
                 }
+                this.transactionHash = transactionHash;
             })
             .on('error', (error) => reject)
             .on('confirmation', (confirmationNumber, receipt) => { 
