@@ -1,22 +1,25 @@
-# Installation
+# Contract 3
+Ethereum / Quorum compatible library that makes smart contract compilation, deployment and interaction easy
+
+## Installation
 
 Go to the project directory and type
 
 `npm install --save contract3`
 
-# Requirements
+## Requirements
 
 Tested with Node 8.0 and web3 version 1.0
 
-# Class functions
+## Class functions
 
-## constructor(web3, isQuorum)
+### constructor(web3, isQuorum)
 Constructor takes web3 object as argument and check if it is a quorum implementation
 ```javascript
 var contract3 = new Contract3(web3, true)
 ```
 
-## compile(source)
+### compile(source)
 Compiles and returns bytes code and other details as produced by solc
 ```javascript
     let Administered = 'contract Administered { .. }';
@@ -28,7 +31,7 @@ Compiles and returns bytes code and other details as produced by solc
     contract3.compile(input)
 ```
 
-## deploy(abi, code, args, from, value, options)
+### deploy(abi, code, args, from, value, options)
 Deploys a existing compiled smart contract. Returns promise containing the receipt and transaction hash of deployed smart contract
 ```javascript
     contract3.deploy([...], '0x45..', ['1'], '0x12d..', 0, {
@@ -37,7 +40,7 @@ Deploys a existing compiled smart contract. Returns promise containing the recei
     })
 ```
 
-## getInstances(source)
+### getInstances(source)
 Compiles and returns instances of the the contracts
 ```javascript
     let Administered = 'contract Administered { .. }';
@@ -51,20 +54,20 @@ Compiles and returns instances of the the contracts
     const Asset = contractInstances['Asset'];
 ```
 
-## getInstance(abi,address)
+### getInstance(abi,address)
 ```javascript
     const abi ={..};
     const address='0xad12313...';
     const contractInstance = await contract3.getInstance(abi,address);
 
 ```
-# Contract Instance methods
+## Contract Instance methods
 
-## constructor(web3, abi, code, isQuorum)
+### constructor(web3, abi, code, isQuorum)
 Constructor takes in web3 instance, abi interface and code as parameter. There is also a parameter to check if this is a quorum implementation. Automatically taken care of when deploying 
 
 
-## deployContract(args, from, value, options)
+### deployContract(args, from, value, options)
 Deploys the contract and creates an instances using args passed as array. From is address of the deployer. Value is the ether value to send to if the constructor is payable. Options are options related to gas and gasPrce.
 ```javascript
     let Administered = 'contract Administered { .. }';
@@ -94,21 +97,21 @@ Deploys the contract and creates an instances using args passed as array. From i
     }
 ```
 
-## setAddress(address)
+### setAddress(address)
 A setter function that sets the address of the instance to call functions of an already deployed contracts
 ```javascript
     const AssetInstance = contractInstances['Asset'];
     AssetInstance.setAddress('0x234924...');
 ```
 
-## get(functionName,args,from) 
+### get(functionName,args,from) 
 A getter function that issue a call to function represented by functionName by passing the arguments given in array format. From is address of the deployer.
 ```javascript
     const result = await AssetInstance.get('getValue',[],'0x12323....');
     console.log(result)
 ```
 
-## set(functionName,args,from, value, options)
+### set(functionName,args,from, value, options)
 A setter function that should be called when modifications in blockchain. Issues a send to function represented by functionName by passing the arguments given in array format. From is address of the deployer. Value is the ether value to send along if the function is payable.
 ```javascript
     const result2 = await contracts.set(ContractObject,'set', [134],'0x12323....', 0,{gas: 100000});
@@ -120,16 +123,16 @@ A setter function that should be called when modifications in blockchain. Issues
 
 Returns transaction reciept
 
-## getReceipt()
+### getReceipt()
 Returns transaction receipt assosciated with contract deployment
 
-## getCode()
+### getCode()
 Returns bytecode of the contract
 
-## getInstance()
+### getInstance()
 Returns web3 contract instance of the instance
 
-# Example
+## Example
 ```javascript
 var Web3 = require('web3');
 
@@ -185,5 +188,5 @@ async function deploy(){
 deploy();
 ```
 
-# Full example
+## Full example
 To see a full example visit [link](https://github.com/mohdrashid/ethereum_asset_exchange_example)
