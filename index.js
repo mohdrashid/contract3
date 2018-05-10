@@ -36,6 +36,7 @@ module.exports = class contract3 {
         .deployContract(args, from, value, options)
         .then(function(data) {
           resolve({
+              instance: contract,
               transactionHash: contract.getTransactionHash(),
               receipt: contract.getReceipt()}
             );
