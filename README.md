@@ -32,7 +32,7 @@ Compiles and returns bytes code and other details as produced by solc
 ```
 
 ### deploy(abi, code, args, from, value, options)
-Deploys a existing compiled smart contract. Returns promise containing the receipt and transaction hash of deployed smart contract
+Deploys a existing compiled smart contract. Returns promise containing the instance, the receipt and transaction hash of deployed smart contract
 ```javascript
     contract3.deploy([...], '0x45..', ['1'], '0x12d..', 0, {
         gas:4712388,
