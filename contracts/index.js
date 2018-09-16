@@ -144,4 +144,13 @@ module.exports = class Contract {
             .on('error', reject)
         })
     }
+
+     /**
+     * Returns encoded value
+     * @param {*} functionName : The name of the function
+     * @param {*} args : Arguments to pass to function if any
+     */
+    getEncoded(functionName,args){
+        return this.instance.methods[functionName].apply(null,args).encodeABI();
+    }
 }
