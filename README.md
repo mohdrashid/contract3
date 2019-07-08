@@ -16,7 +16,7 @@ Tested with Node 8.0 and web3 version 1.0
 ### constructor(web3, isQuorum)
 Constructor takes web3 object as argument and check if it is a quorum implementation
 ```javascript
-var contract3 = new Contract3(web3, true)
+const contract3 = new Contract3(web3, true)
 ```
 
 ### compile(source)
@@ -134,17 +134,17 @@ Returns web3 contract instance of the instance
 
 ## Example
 ```javascript
-var Web3 = require('web3');
+const Web3 = require('web3');
 
 const config = {
     host: 'localhost',
     port: 8545
 };
 
-var web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.host+":"+config.port));
+const web3 = new Web3(new Web3.providers.HttpProvider('http://'+config.host+":"+config.port));
 
-var Contract3 = require('contract3');
-var contract3 = new Contract3(web3);
+const Contract3 = require('contract3');
+let contract3 = new Contract3(web3);
 
 async function deploy(){
     let Administered = 'contract Administered { .. }';

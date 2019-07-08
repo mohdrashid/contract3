@@ -30,7 +30,7 @@ module.exports = class contract3 {
    * @param {*} options : Other options like privateFor, gas, gasPrice, etc
    */
   deploy(abi, code, args, from, value, options) {
-    var contract = new Contract(this.web3, abi, code, this.isQuorum);
+    const contract = new Contract(this.web3, abi, code, this.isQuorum);
     return new Promise(function(resolve, reject) {
       contract
         .deployContract(args, from, value, options)
