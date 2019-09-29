@@ -31,17 +31,18 @@ module.exports = class contract3 {
    */
   deploy(abi, code, args, from, value, options) {
     const contract = new Contract(this.web3, abi, code, this.isQuorum);
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       contract
         .deployContract(args, from, value, options)
-        .then(function(data) {
+        .then(function (data) {
           resolve({
-              instance: contract,
-              transactionHash: contract.getTransactionHash(),
-              receipt: contract.getReceipt()}
-            );
+            instance: contract,
+            transactionHash: contract.getTransactionHash(),
+            receipt: contract.getReceipt()
+          }
+          );
         })
-        .catch(function(err) {
+        .catch(function (err) {
           reject(err);
         });
     });
@@ -57,7 +58,7 @@ module.exports = class contract3 {
    */
   getInstances(source) {
     const compileResults = this.compile(source);
-    if(compileResults.errors){
+    if (compileResults.errors) {
       throw compileResults.errors;
     }
     const compiled = compileResults["contracts"];
@@ -69,7 +70,7 @@ module.exports = class contract3 {
       const name = i.split(":")[1];
       const bytecode = compiled[i]["bytecode"];
       const abi = JSON.parse(compiled[i]["interface"]);
-      compiledInstances[name] = function() {
+      compiledInstances[name] = function () {
         return new Contract(Web3, abi, bytecode, IsQuorum);
       };
     }
