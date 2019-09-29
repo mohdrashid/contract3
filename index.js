@@ -7,9 +7,8 @@ module.exports = class contract3 {
    * @param {*} web3 : web3 instance
    * @param {*} isQuorum : Checks if it a quorum implementation
    */
-  constructor(web3, isQuorum) {
+  constructor(web3) {
     this.web3 = web3;
-    this.isQuorum = isQuorum;
   }
 
   /**
@@ -43,7 +42,7 @@ module.exports = class contract3 {
    * @param {*} options : Other options like privateFor, gas, gasPrice, etc
    */
   deploy(abi, code, args, from, value, options) {
-    const contract = new Contract(this.web3, abi, code, this.isQuorum);
+    const contract = new Contract(this.web3, abi, code);
     return new Promise(function (resolve, reject) {
       contract
         .deployContract(args, from, value, options)
