@@ -56,7 +56,11 @@ module.exports = class contract3 {
    * }
    */
   getInstances(source) {
-    const compiled = this.compile(source)["contracts"];
+    const compileResults = this.compile(source);
+    if(compileResults.errors){
+      throw compileResults.errors;
+    }
+    const compiled = compileResults["contracts"];
     const Web3 = this.web3;
     const IsQuorum = this.isQuorum;
 
