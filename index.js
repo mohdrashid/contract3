@@ -17,7 +17,20 @@ module.exports = class contract3 {
    * @param {*} source
    */
   compile(source) {
-    return solc.compile({ sources: source }, 1);
+    const input = {
+      language: 'Solidity',
+      sources: source,
+      settings: {
+        outputSelection: {
+          '*': {
+            '*': ['*']
+          }
+        }
+      }
+    }
+
+    return JSON.parse(solc.compile(JSON.stringify(input)))
+    //return solc.compile({ sources: source }, 1);
   }
 
   /**
@@ -66,10 +79,10 @@ module.exports = class contract3 {
     const IsQuorum = this.isQuorum;
 
     let compiledInstances = {};
-    for (var i in compiled) {
-      const name = i.split(":")[1];
-      const bytecode = compiled[i]["bytecode"];
-      const abi = JSON.parse(compiled[i]["interface"]);
+    for (let i in compiled) {
+      const name = i.split(".")[0];
+      const bytecode = compiled[i][name]["bytecode"];
+      const abi = compiled[i][name]["abi"];
       compiledInstances[name] = function () {
         return new Contract(Web3, abi, bytecode, IsQuorum);
       };
