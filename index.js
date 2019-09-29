@@ -81,7 +81,7 @@ module.exports = class contract3 {
     let compiledInstances = {};
     for (let i in compiled) {
       const name = i.split(".")[0];
-      const bytecode = compiled[i][name]["bytecode"];
+      const bytecode = compiled[i][name]["evm"]["bytecode"]["object"];
       const abi = compiled[i][name]["abi"];
       compiledInstances[name] = function () {
         return new Contract(Web3, abi, bytecode, IsQuorum);
