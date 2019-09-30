@@ -25,8 +25,9 @@ Compiles and returns bytes code and other details as produced by solc
     let Administered = 'contract Administered { .. }';
     let Asset = 'contract Asset { .. }';
     let input = {
-        'Administered.sol': Administered,
-        'Asset.sol': Asset
+        'Administered.sol': {
+            content: Administered},
+        'Asset.sol': {contenet: Asset}
     }
     contract3.compile(input)
 ```

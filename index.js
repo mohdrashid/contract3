@@ -28,8 +28,22 @@ module.exports = class contract3 {
       }
     }
 
-    return JSON.parse(solc.compile(JSON.stringify(input)))
-    //return solc.compile({ sources: source }, 1);
+    const compileResults = JSON.parse(solc.compile(JSON.stringify(input)));
+    if (compileResults.errors) {
+      throw compileResults.errors;
+    }
+    const compiled = compileResults["contracts"];
+    let compiledInstances = {};
+    for (let i in compiled) {
+      const name = i.split(".")[0];
+      const bytecode = compiled[i][name]["evm"]["bytecode"]["object"];
+      const abi = compiled[i][name]["abi"];
+      compiledInstances[name] = {
+        bytecode: bytecode,
+        abi: abi
+      }
+    }
+    return compiledInstances;
   }
 
   /**
@@ -70,20 +84,10 @@ module.exports = class contract3 {
    */
   getInstances(source) {
     const compileResults = this.compile(source);
-    if (compileResults.errors) {
-      throw compileResults.errors;
-    }
-    const compiled = compileResults["contracts"];
-    const Web3 = this.web3;
-    const IsQuorum = this.isQuorum;
-
     let compiledInstances = {};
-    for (let i in compiled) {
-      const name = i.split(".")[0];
-      const bytecode = compiled[i][name]["evm"]["bytecode"]["object"];
-      const abi = compiled[i][name]["abi"];
-      compiledInstances[name] = function () {
-        return new Contract(Web3, abi, bytecode, IsQuorum);
+    for (let name in compileResults) {
+      compiledInstances[name] = () => {
+        return new Contract(this.web3, compileResults[name].abi, compileResults[name].bytecode);
       };
     }
     return compiledInstances;
