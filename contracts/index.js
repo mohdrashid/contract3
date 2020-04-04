@@ -195,7 +195,7 @@ module.exports = class Contract {
     * @param {*} functionName : The name of the function
     * @param {*} args : Arguments to pass to function if any
     */
-    getEncoded(functionName, args) {
+    getFunctionEncoded(functionName, args) {
         return this.instance.methods[functionName].apply(null, args).encodeABI();
     }
 

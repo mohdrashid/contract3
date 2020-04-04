@@ -198,6 +198,17 @@ Returns transaction reciept
         },
         "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
 ```
+### getFunctionEncoded(functionName, args)
+Returns encoded value for a function to use for sending signed transaction
+1. `functionName` Smart contract function name
+2. `args` are arguments to be passed to constructor 
+
+```javascript
+    const abi ={..};
+    const contractInstance = await contract3.getInstance(abi);
+    console.log(contractInstance.getFunctionEncoded("get",[]));
+```
+
 
 ### getReceipt()
 Returns transaction receipt assosciated with contract deployment
