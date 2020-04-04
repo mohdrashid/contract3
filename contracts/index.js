@@ -116,6 +116,9 @@ module.exports = class Contract {
                 const serializedTx = tx.serialize();
                 this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
                     .on('confirmation', (confirmationNumber, receipt) => {
+                        this.setAddress(receipt.contractAddress);
+                        this.transactionHash = receipt.transactionHash;
+                        this.receipt = receipt;
                         resolve(receipt);
                     })
                     .on('error', reject)

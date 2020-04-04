@@ -13,10 +13,17 @@ Tested with Node 8.0 and web3 version 1.0
 
 ## Class functions
 
-### constructor(web3)
-Constructor takes web3 object as argument
+### constructor(web, solc)
+Constructor takes web3 object as argument. Optionally solc is also taken to support with compilation
 ```javascript
-const contract3 = new Contract3(web3)
+/*Pre Requisite*/
+const Web3 = require('web3');
+const provider = new Web3.providers.HttpProvider(YOUR_URL);
+const web3 = new Web3(provider);
+const solc = require('solc');
+/*Pre-requistie End*/
+
+const contract3 = new Contract3(web3, solc)
 ```
 
 ### compile(source)
@@ -32,14 +39,29 @@ Compiles and returns bytes code and other details as produced by solc
     contract3.compile(input)
 ```
 
-### deploy(abi, code, args, from, value, options)
+### deploy(abi, code, args, from, options)
 Deploys a existing compiled smart contract. Returns promise containing the instance, the receipt and transaction hash of deployed smart contract
 ```javascript
     contract3.deploy([...], '0x45..', ['1'], '0x12d..', 0, {
         gas:4712388,
-        privateFor: []
+        //privateFor: [], /*This is for Quorum*/
+        //value:<Any Ether to send>
     })
 ```
+
+### Deploy contract as a signed Transaction
+Deploys a existing compiled smart contract. Returns promise containing the instance, the receipt and transaction hash of deployed smart contract
+```javascript
+    const abi ={..};
+    const contractInstance = await contract3.getInstance(abi);
+    contractInstance.signedTxDeployContract(["arg1",true],
+        {
+            gas: 4712388,
+            value: '0x00'
+        },
+        "dfae4457ef0fd39416597da2fab6739b1891530a33576849a32f87c3f6c06872"/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01A865dc8B3abd299b6a"/*Ethereum_Address*/)
+```
+For calling contract methods as signed tx refer to "Contract Instance methods" section
 
 ### getInstances(source)
 Compiles and returns instances of the the contracts
