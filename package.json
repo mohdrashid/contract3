@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/mohdrashid/contract3#readme",
   "dependencies": {
-    "solc": "^0.5.11"
+    "ethereumjs-tx": "^2.1.2"
   }
 }
