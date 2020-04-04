@@ -59,7 +59,7 @@ Deploys a existing compiled smart contract. Returns promise containing the insta
             gas: 4712388,
             value: '0x00'
         },
-        "dfae4457ef0fd39416597da2fab6739b1891530a33576849a32f87c3f6c06872"/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01A865dc8B3abd299b6a"/*Ethereum_Address*/)
+        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
 ```
 For calling contract methods as signed tx refer to "Contract Instance methods" section
 
@@ -90,7 +90,7 @@ Compiles and returns instances of the the contracts
 Constructor takes in web3 instance, abi interface and code as parameter. Automatically taken care of when deploying 
 
 
-### deployContract(args, from, value, options)
+### deployContract(args, from, options)
 Deploys the contract and creates an instances using args passed as array. From is address of the deployer. Value is the ether value to send to if the constructor is payable. Options are options related to gas and gasPrce.
 ```javascript
     let Administered = 'contract Administered { .. }';
@@ -100,17 +100,16 @@ Deploys the contract and creates an instances using args passed as array. From i
         'Asset.sol': Asset
     }
     const contractInstances = await contract3.getInstances(input);
-    const AssetInstance = contractInstances['Asset']();
+    const AssetInstance = contractInstances['Asset'];
     try{
         const ContractObject = await AssetInstance.deployContract(
             //args to constuctor
             ["computerSystem",defaultAccount,100],
             //deployer
             '0x12323....', 
-            //Ether to send
-            0, 
             //Other Parameters
             {
+                value: 0,
                 gas:4712388
             });
         console.log('Contract Address: ',ContractObject.options.address)
@@ -118,6 +117,35 @@ Deploys the contract and creates an instances using args passed as array. From i
     catch (err) {
         console.log(err)
     }
+```
+
+### deployContractEncoded(args) 
+Interface to get encoded transaction data for contact deployment
+1. `args` are arguments to be passed to constructor 
+
+```javascript
+    const abi ={..};
+    const contractInstance = await contract3.getInstance(abi);
+    console.log(contractInstance.deployContractEncoded([]));
+```
+
+### signedTxDeployContract(args, options, privateKey, nonceFetchFlag, address) 
+Deploys the contract as a singed transaction. 
+1. `args` are arguments to be passed to constructor
+2. `options` contains standard web3 options like gas, value, etc. 
+3. `privateKey` is the private key to be used for signing transaction. 
+4. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
+5. `address` is the ethereum account address. This is mandatory when nonceFetchKey flag is set
+
+```javascript
+    const abi ={..};
+    const contractInstance = await contract3.getInstance(abi);
+    contractInstance.signedTxDeployContract(["arg1",true],
+        {
+            gas: 4712388,
+            value: '0x00'
+        },
+        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
 ```
 
 ### setAddress(address)
@@ -134,8 +162,11 @@ A getter function that issue a call to function represented by functionName by p
     console.log(result)
 ```
 
-### set(functionName,args,from, value, options)
+### set(functionName,args,from,options)
 A setter function that should be called when modifications in blockchain. Issues a send to function represented by functionName by passing the arguments given in array format. From is address of the deployer. Value is the ether value to send along if the function is payable.
+
+Returns transaction reciept
+
 ```javascript
     const result2 = await contracts.set(ContractObject,'set', [134],'0x12323....', 0,{gas: 100000});
     if (result2) {
@@ -144,7 +175,29 @@ A setter function that should be called when modifications in blockchain. Issues
     }
 ```
 
+
+
+### signedTxFunctionCall(functionName, args, options, privateKey, nonceFetchFlag, address) 
+Deploys the contract as a singed transaction.
+1. `functionName` Smart contract function name
+2. `args` are arguments to be passed to constructor
+3. `options` contains standard web3 options like gas, value, etc. 
+4. `privateKey` is the private key to be used for signing transaction. 
+5. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
+6. `address` is the ethereum account address. This is mandatory when nonceFetchKey flag is set
+
 Returns transaction reciept
+
+```javascript
+    const abi ={..};
+    const contractInstance = await contract3.getInstance(abi);
+    contractInstance.signedTxDeployContract(["arg1",true],
+        {
+            gas: 4712388,
+            value: '0x00'
+        },
+        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
+```
 
 ### getReceipt()
 Returns transaction receipt assosciated with contract deployment
