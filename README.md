@@ -20,6 +20,7 @@ Below are example of using this library to interact with Smart Contracts
     const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
     const Contract3 = require('contract3');
     let contract3 = new Contract3(web3);
+    contract3.setSolc(require('solc'));
 
     async function deploy(){
         let Administered = 'contract Administered { .. }';
@@ -43,19 +44,17 @@ Below are example of using this library to interact with Smart Contracts
             const ContractDeploymentResponse = await AssetInstance.deployContract(
                 //args to constuctor
                 ["computerSystem",defaultAccount,100],
-                //deployer
-                defaultAccount, 
-                //Other Parameters
+                //Options
                 {
                     gas:4712388
                 });
                 console.log('Contract Address:',ContractDeploymentResponse.options.address)
-                const result = await AssetInstance.get('getValue',[],defaultAccount);
+                const result = await AssetInstance.get('getValue',[]);
                 console.log('Value of Asset:', result)
                 console.log('Changing Asset Value')
-                const result2 = await AssetInstance.set('changeValue', [134],defaultAccount);
+                const result2 = await AssetInstance.set('changeValue', [134],{gas:40000});
                 if (result2) {
-                    const result = await AssetInstance.get('getValue',[],defaultAccount);
+                    const result = await AssetInstance.get('getValue',[]);
                     console.log('New Asset Value:', result)
                 }
         } catch(e){
@@ -71,7 +70,7 @@ This method is useful for consuming apis of services like infura to interact wit
     const Web3 = require('web3');
     const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
     const Contract3 = require('contract3');
-    let contract3 = new Contract3(web3);
+    let contract3 = new Contract3(web3, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/, "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/);
     const abi ={..};
     const contractInstance = await contract3.getInstance(abi);
     //Deploying contrcat
@@ -79,37 +78,47 @@ This method is useful for consuming apis of services like infura to interact wit
         {
             gas: 4712388,
             value: '0x00'
-        },
-        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
+        })
 
     //Calling a contract function 
     const data = await instance.signedTxFunctionCall('storeSellerInvoice', ["0xfa3a43c04170d3b35bae1a8d8e7c83bc5add4ed8a36f7e0586814344d1bef229"],
         {
             gas: 4712388,
-            to: '0xe7629b79Ca74F0d7458Eb3449eB5476E6Ca15327',
             value: '0x00'
-        },
-        "dfae4457ef0fd39416597da2fab6739b1891530a33576849a32f87c3f6c06870", true, "0x4E5feB13de0e29BC4aeA01A865dc8B3abd299b6a");
+        });
 ```
 For calling contract methods as signed tx refer to "Contract Instance methods" section
 
 ## Class functions
 
-### constructor(web3, solc)
-Constructor takes web3 object as argument. Optionally solc is also taken to support with compilation
+### constructor(web3, address, privateKey, nonceFetchFlag)
+Constructor takes web3 object as argument. 
 1. `web3` a intialized web3 instance
-2. `solc` Solc compiler (This is optional and only required if compiling of code is required)
+2. `address` is the ethereum account address 
+3. `privateKey` is the private key to be used for signing transaction. 
+4. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
 
 ```javascript
 /*Pre Requisite*/
 const Web3 = require('web3');
 const provider = new Web3.providers.HttpProvider(YOUR_URL);
 const web3 = new Web3(provider);
-const solc = require('solc');
 /*Pre-requistie End*/
-
-const contract3 = new Contract3(web3, solc)
+//For signed
+const contract3 = new Contract3(web3, "0xe3424234...","4de223424324324....", true);
+//For non-singed tx
+const contract3 = new Contract3(web3, "0xe3424234...");
 ```
+
+### setSolc(solc)
+Constructor takes web3 object as argument. 
+1. `solc` is Solc instance if compiling is needed
+```javascript
+const solc = require('solc');
+...
+contract3.setSolc(solc);
+```
+
 
 ### compile(source)
 Compiles and returns bytes code and other details as produced by solc
@@ -126,16 +135,15 @@ Compiles and returns bytes code and other details as produced by solc
     contract3.compile(input)
 ```
 
-### deploy(abi, code, args, from, options)
+### deploy(abi, code, args, options)
 Deploys a existing compiled smart contract. Returns promise containing the instance, the receipt and transaction hash of deployed smart contract
 1. `abi` is the ABI of the smart contract
 2. `code` is the bytecode of the smart contract
 3. `args` are the constuctor arguments for initializing the contract
-4. `from` is the account that is sending transaction. This account must be unlocked prior to execution 
-3. `options` contains standard web3 options like gas, value, etc. 
+4. `options` contains standard web3 options like gas, value, etc. 
 
 ```javascript
-    contract3.deploy([...], '0x45..', ['1'], '0x12d..', 0, {
+    contract3.deploy([...], '0x45..', ['1'], {
         gas:4712388,
         //privateFor: [], /*This is for Quorum*/
         //value:<Any Ether to send>
@@ -172,11 +180,10 @@ Use this method to get instance of pre-compiled smart contract (Does not work if
 ```
 ## Contract Instance methods
 
-### deployContract(args, from, options)
+### deployContract(args, options)
 Deploys the contract as a singed transaction. Deploys the contract and creates an instances using args passed as array. 
 1. `args` are arguments to be passed to constructor
-2. `from` is the ethereum account address
-3. `options` contains standard web3 options like gas, value, etc. 
+2. `options` contains standard web3 options like gas, value, etc. 
 
 
 ```javascript
@@ -192,8 +199,6 @@ Deploys the contract as a singed transaction. Deploys the contract and creates a
         const ContractObject = await AssetInstance.deployContract(
             //args to constuctor
             ["computerSystem",defaultAccount,100],
-            //deployer
-            '0x12323....', 
             //Other Parameters
             {
                 value: 0,
@@ -216,23 +221,19 @@ Interface to get encoded transaction data for contact deployment
     console.log(contractInstance.deployContractEncoded([]));
 ```
 
-### signedTxDeployContract(args, options, privateKey, nonceFetchFlag, address) 
+### signedTxDeployContract(args, options) 
 Deploys the contract as a singed transaction. 
 1. `args` are arguments to be passed to constructor
 2. `options` contains standard web3 options like gas, value, etc. 
-3. `privateKey` is the private key to be used for signing transaction. 
-4. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
-5. `address` is the ethereum account address. This is mandatory when nonceFetchKey flag is set
 
 ```javascript
     const abi ={..};
     const contractInstance = await contract3.getInstance(abi);
-    contractInstance.signedTxDeployContract(["arg1",true],
+    const txData = await contractInstance.signedTxDeployContract(["arg1",true],
         {
             gas: 4712388,
             value: '0x00'
-        },
-        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
+        });
 ```
 
 ### setAddress(address)
@@ -243,55 +244,50 @@ A setter function that sets the address of the instance to call functions of an 
     AssetInstance.setAddress('0x234924...');
 ```
 
-### get(functionName,args,from) 
+### get(functionName,args) 
 A getter function that issue a call to function represented by functionName by passing the arguments given in array format. 
 1. `functionName` Smart contract function name
 2. `args` are arguments to be passed to constructor. Its a array so multiple arguments can be passed dynamically
-3. `from` is the etherum address of the sender
+
 ```javascript
-    const result = await AssetInstance.get('getValue',[],'0x12323....');
+    const result = await AssetInstance.get('getValue',[]);
     console.log(result)
 ```
 
-### set(functionName,args,from,options)
+### set(functionName,args,options)
 Set is used to perform send transactions on functions of a deployed smart contract. 
 1. `functionName` Smart contract function name
 2. `args` are arguments to be passed to constructor. Its a array so multiple arguments can be passed dynamically
-3. `from` is the etherum address of the sender
-4. `options` contains standard web3 options like gas, value, etc. 
+3. `options` contains standard web3 options like gas, value, etc. 
 
 Returns transaction reciept
 
 ```javascript
-    const result2 = await contracts.set(ContractObject,'set', [134],'0x12323....', 0,{gas: 100000});
+    const result2 = await contracts.set(ContractObject,'set', [134],{gas: 100000});
     if (result2) {
-        const result = await contracts.get(ContractObject,'get',[],'0x12323....');
+        const result = await contracts.get(ContractObject,'get',[]);
         console.log(result)
     }
 ```
 
 
 
-### signedTxFunctionCall(functionName, args, options, privateKey, nonceFetchFlag, address) 
+### signedTxFunctionCall(functionName, args, options) 
 Deploys the contract as a singed transaction.
 1. `functionName` Smart contract function name
 2. `args` are arguments to be passed to constructor
 3. `options` contains standard web3 options like gas, value, etc. 
-4. `privateKey` is the private key to be used for signing transaction. 
-5. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
-6. `address` is the ethereum account address. This is mandatory when nonceFetchKey flag is set
 
 Returns transaction reciept
 
 ```javascript
     const abi ={..};
     const contractInstance = await contract3.getInstance(abi);
-    contractInstance.signedTxDeployContract(["arg1",true],
+    const data = await contractInstance.signedTxFunctionCall('storeSellerInvoice', ["0xfa3a43c04170d3b35bae1a8d8e7c83bc5add4ed8a36f7e0586814344d1bef229"],
         {
             gas: 4712388,
             value: '0x00'
-        },
-        "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/)
+        });
 ```
 ### getFunctionEncoded(functionName, args)
 Returns encoded value for a function to use for sending signed transaction

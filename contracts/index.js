@@ -6,13 +6,20 @@ module.exports = class Contract {
      * @param {*} web3 : An instance of web3
      * @param {*} abi : ABI of the contract
      * @param {*} code : Byte code of the contract
-     * @param {*} isQuorum : Check if it ethereum mainpnet or quorum implementation
+     * @param {*} address : Ethreum Address
+     * @param {*} privateKey : Private Key (Needed only if using signed transactions)
+     * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value (Needed only if using signed transactions)
      */
-    constructor(web3, abi, code) {
+    constructor(web3, abi, code, address, privateKey, nonceFetchFlag) {
         this.web3 = web3;
         this.instance = new this.web3.eth.Contract(abi);
         this.code = '0x' + code;
         this.receipt = undefined;
+        this.address = address;
+        if (privateKey) {
+            this.privateKey = privateKey;
+            this.nonceFetchFlag = nonceFetchFlag;
+        }
         this.transactionHash = undefined;
     }
 
@@ -47,12 +54,11 @@ module.exports = class Contract {
     /**
      * Deploys a contract from the instance
      * @param {*} args : Any arguments to pass to the constructor
-     * @param {*} from : The initiator of contract
      * @param {*} options : Any other options related to values, gas or gasPrice
      */
-    deployContract(args, from, options) {
+    deployContract(args, options) {
         let sendParmas = {
-            from: from
+            from: this.address
         }
 
         for (let key in options) {
@@ -93,28 +99,41 @@ module.exports = class Contract {
 
     }
 
+
+    /**
+     * Generates a signed transaction object
+     * @param {*} encoded : Encoded transaction data
+     * @param {*} options : Ethereum options like gas, value, etc.
+     */
+    async signTx(encoded, options) {
+        if (this.privateKey === undefined) {
+            throw new Error(JSON.stringify({
+                code: 1,
+                message: "Private key cannot be null for a signed transaction. Please initialize constructor with a proper private key"
+            }))
+        }
+        if (this.nonceFetchFlag) {
+            options['nonce'] = await this.web3.eth.getTransactionCount(this.address, 'pending');
+        }
+        options['data'] = encoded;
+        const tx = new Tx(options);
+        tx.sign(this.privateKey);
+        const serializedTx = tx.serialize();
+        const final = '0x' + serializedTx.toString('hex');
+        return final;
+    }
+
     /**
      * This function deploys contract using signed transaction method
-     * @param {*} functionName : Name of the function to call
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
-     * @param {*} privateKey : Private key
-     * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value
-     * @param {*} address : If nonceFetchFlag is set, this ethereum address will be used
      */
-    signedTxDeployContract(args, options, privateKey, nonceFetchFlag, address) {
+    signedTxDeployContract(args, options) {
         return new Promise(async (resolve, reject) => {
             try {
-                if (nonceFetchFlag) {
-                    options['nonce'] = await this.web3.eth.getTransactionCount(address, 'pending');
-                }
                 const encoded = this.deployContractEncoded(args);
-                options['data'] = encoded;
-                const tx = new Tx(options);
-                const pKey = new Buffer(privateKey, 'hex')
-                tx.sign(pKey);
-                const serializedTx = tx.serialize();
-                this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+                const txData = await this.signTx(encoded, options);
+                this.web3.eth.sendSignedTransaction(txData)
                     .on('confirmation', (confirmationNumber, receipt) => {
                         this.setAddress(receipt.contractAddress);
                         this.transactionHash = receipt.transactionHash;
@@ -148,12 +167,11 @@ module.exports = class Contract {
      * A getter interface for contract functions/public variables
      * @param {*} functionName : The name of the function or variable name
      * @param {*} args : Arguments to pass to function if any
-     * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    get(functionName, args, from) {
+    get(functionName, args) {
         let sendParmas = {
-            from: from
+            from: this.address
         }
         return this.instance.methods[functionName].apply(null, args).call(sendParmas);
     }
@@ -162,12 +180,11 @@ module.exports = class Contract {
      * A setter interface for calling contract functions
      * @param {*} functionName : The name of the function
      * @param {*} args : Arguments to pass to function if any
-     * @param {*} from : Caller address
      * @param {*} value : Ether to send if the function is payable
      */
-    set(functionName, args, from, options) {
+    set(functionName, args, options) {
         let sendParmas = {
-            from: from
+            from: this.address
         }
 
         for (let key in options) {
@@ -204,23 +221,14 @@ module.exports = class Contract {
      * @param {*} functionName : Name of the function to call
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
-     * @param {*} privateKey : Private key
-     * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value
-     * @param {*} address : If nonceFetchFlag is set, this ethereum address will be used
      */
-    signedTxFunctionCall(functionName, args, options, privateKey, nonceFetchFlag, address) {
+    signedTxFunctionCall(functionName, args, options) {
+        options['to'] = this.instance.options.address;
         return new Promise(async (resolve, reject) => {
             try {
-                if (nonceFetchFlag) {
-                    options['nonce'] = await this.web3.eth.getTransactionCount(address, 'pending');
-                }
                 const encoded = this.getFunctionEncoded(functionName, args);
-                options['data'] = encoded;
-                const tx = new Tx(options);
-                const pKey = new Buffer(privateKey, 'hex')
-                tx.sign(pKey);
-                const serializedTx = tx.serialize();
-                this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'))
+                const txData = await this.signTx(encoded, options);
+                this.web3.eth.sendSignedTransaction(txData)
                     .on('confirmation', (confirmationNumber, receipt) => {
                         resolve(receipt);
                     })
