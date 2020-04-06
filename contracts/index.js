@@ -214,7 +214,7 @@ module.exports = class Contract {
                 if (nonceFetchFlag) {
                     options['nonce'] = await this.web3.eth.getTransactionCount(address, 'pending');
                 }
-                const encoded = this.getEncoded(functionName, args);
+                const encoded = this.getFunctionEncoded(functionName, args);
                 options['data'] = encoded;
                 const tx = new Tx(options);
                 const pKey = new Buffer(privateKey, 'hex')
