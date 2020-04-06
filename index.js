@@ -46,6 +46,35 @@ module.exports = class contract3 {
     });
   }
 
+  /**
+   *Deploys a contract and returns instance
+   * @param {*} abi : Abi of the contract
+   * @param {*} code : bytecode of the contract
+   * @param {*} args : Constructor arguments of the smart contract
+   * @param {*} options : Other options like privateFor, value, gas, gasPrice, etc
+   * @param {*} privateKey : Private key
+   * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value
+   * @param {*} address : If nonceFetchFlag is set, this ethereum address will be used
+   */
+  deploySinged(abi, code, args, privateKey, options, nonceFetchFlag, address) {
+    const contract = new Contract(this.web3, abi, code);
+    return new Promise(function (resolve, reject) {
+      contract
+        .signedTxDeployContract(args, options, privateKey, nonceFetchFlag, address)
+        .then(function (data) {
+          resolve({
+            instance: contract,
+            transactionHash: contract.getTransactionHash(),
+            receipt: contract.getReceipt()
+          }
+          );
+        })
+        .catch(function (err) {
+          reject(err);
+        });
+    });
+  }
+
 
 
   /**
