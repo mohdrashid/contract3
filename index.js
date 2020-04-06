@@ -121,7 +121,7 @@ module.exports = class contract3 {
    * @param {*} address : Address of any exitsting contract
    */
   getInstance(abi, address) {
-    let c = new Contract(this.web3, abi, this.address, this.privateKey, this.nonceFetchFlag);
+    let c = new Contract(this.web3, abi, "", this.address, this.privateKey, this.nonceFetchFlag);
     c.setAddress(address);
     return c;
   }
