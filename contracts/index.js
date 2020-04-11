@@ -13,24 +13,7 @@ module.exports = class Contract {
      */
     constructor(web3, abi, code, address, privateKey, nonceFetchFlag) {
         this.web3 = web3;
-        // Concatenate function name with its param types
-        const prepareData = e => `${e.name}(${e.inputs.map(e => e.type)})`
-
-        // Encode function selector (assume web3 is globally available)
-        const encodeSelector = f => this.web3.utils.sha3(f)//.slice(0, 10)
-
-        // Parse ABI and encode its functions
-        this.hashMap = {};
-        abi
-            .filter(e => (e.type === "event" || e.type === "function"))
-            .map(e => {
-                this.hashMap[encodeSelector(prepareData(e))] = {
-                    name: e.name,
-                    inputs: e.inputs
-                }
-            })
         abiDecoder.addABI(abi);
-
         this.instance = new this.web3.eth.Contract(abi);
         this.code = '0x' + code;
         this.receipt = undefined;
@@ -58,9 +41,9 @@ module.exports = class Contract {
     }
 
     /**
-     * Returns contract deployment transaction receipt
+     * Returns deployment transaction receipt
      */
-    getTranactionReceipt() {
+    getReceipt() {
         return this.receipt;
     }
 
@@ -75,9 +58,9 @@ module.exports = class Contract {
      * Deploys a contract from the instance
      * @param {*} args : Any arguments to pass to the constructor
      * @param {*} options : Any other options related to values, gas or gasPrice
-     * @param {*} isTxHashOnly : Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
-    deployContract(args, options, isTxHashOnly) {
+    deployContract(args, options) {
         let sendParmas = {
             from: this.address
         }
@@ -149,7 +132,7 @@ module.exports = class Contract {
      * This function deploys contract using signed transaction method
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
-     * @param {*} isTxHashOnly : Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
     signedTxDeployContract(args, options, isTxHashOnly) {
         return new Promise(async (resolve, reject) => {
@@ -212,7 +195,7 @@ module.exports = class Contract {
      * @param {*} functionName : The name of the function
      * @param {*} args : Arguments to pass to function if any
      * @param {*} value : Ether to send if the function is payable
-     * @param {*} isTxHashOnly : Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
     set(functionName, args, options, isTxHashOnly) {
         let sendParmas = {
@@ -253,7 +236,7 @@ module.exports = class Contract {
      * @param {*} functionName : Name of the function to call
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
-     * @param {*} isTxHashOnly : Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
     signedTxFunctionCall(functionName, args, options, isTxHashOnly) {
         options['to'] = this.instance.options.address;
@@ -296,7 +279,7 @@ module.exports = class Contract {
     }
 
     /**
-     * Returns transaction data with decoded input
+     * Returns receipt with decoded transaction log
      * @param {*} hash Transaction Hash
      */
     getTransaction(hash) {
