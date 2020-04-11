@@ -1,4 +1,5 @@
 const Tx = require('ethereumjs-tx').Transaction;
+const abiDecoder = require('abi-decoder'); // NodeJS
 module.exports = class Contract {
 
     /**
@@ -12,6 +13,24 @@ module.exports = class Contract {
      */
     constructor(web3, abi, code, address, privateKey, nonceFetchFlag) {
         this.web3 = web3;
+        // Concatenate function name with its param types
+        const prepareData = e => `${e.name}(${e.inputs.map(e => e.type)})`
+
+        // Encode function selector (assume web3 is globally available)
+        const encodeSelector = f => this.web3.utils.sha3(f)//.slice(0, 10)
+
+        // Parse ABI and encode its functions
+        this.hashMap = {};
+        abi
+            .filter(e => (e.type === "event" || e.type === "function"))
+            .map(e => {
+                this.hashMap[encodeSelector(prepareData(e))] = {
+                    name: e.name,
+                    inputs: e.inputs
+                }
+            })
+        abiDecoder.addABI(abi);
+
         this.instance = new this.web3.eth.Contract(abi);
         this.code = '0x' + code;
         this.receipt = undefined;
@@ -20,6 +39,7 @@ module.exports = class Contract {
             this.privateKey = privateKey;
             this.nonceFetchFlag = nonceFetchFlag;
         }
+        this.contractAddress = undefined;
         this.transactionHash = undefined;
     }
 
@@ -55,6 +75,7 @@ module.exports = class Contract {
      * Deploys a contract from the instance
      * @param {*} args : Any arguments to pass to the constructor
      * @param {*} options : Any other options related to values, gas or gasPrice
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
     deployContract(args, options) {
         let sendParmas = {
@@ -67,23 +88,24 @@ module.exports = class Contract {
 
         return new Promise((resolve, reject) => {
 
-            this.instance.deploy({
+            const response = this.instance.deploy({
                 data: this.code,
                 arguments: args
-            }).send(sendParmas, (error, transactionHash) => {
-                if (error) {
-                    reject(error)
-                }
-                this.transactionHash = transactionHash;
-            })
-                .on('error', (error) => reject)
-                .on('confirmation', (confirmationNumber, receipt) => {
+            }).send(sendParmas);
+
+            if (isTxHashOnly) {
+                response.on('transactionHash', (txHash) => {
+                    this.transactionHash = txHash;
+                    resolve({ txHash });
+                });
+            } else {
+                response.on('receipt', (receipt) => {
+                    this.setAddress(receipt.contractAddress);
+                    this.transactionHash = receipt.transactionHash;
                     this.receipt = receipt;
-                    this.instance.options.address = receipt.contractAddress;
                     resolve(this.instance);
                 });
-
-
+            }
         });
     }
 
@@ -116,7 +138,7 @@ module.exports = class Contract {
             options['nonce'] = await this.web3.eth.getTransactionCount(this.address, 'pending');
         }
         options['data'] = encoded;
-        const tx = new Tx(options);
+        const tx = new Tx(options, { 'chain': 'ropsten' });
         tx.sign(this.privateKey);
         const serializedTx = tx.serialize();
         const final = '0x' + serializedTx.toString('hex');
@@ -127,20 +149,28 @@ module.exports = class Contract {
      * This function deploys contract using signed transaction method
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
-    signedTxDeployContract(args, options) {
+    signedTxDeployContract(args, options, isTxHashOnly) {
         return new Promise(async (resolve, reject) => {
             try {
                 const encoded = this.deployContractEncoded(args);
                 const txData = await this.signTx(encoded, options);
-                this.web3.eth.sendSignedTransaction(txData)
-                    .on('confirmation', (confirmationNumber, receipt) => {
+                const response = this.web3.eth.sendSignedTransaction(txData);
+                if (isTxHashOnly) {
+                    response.on('transactionHash', (txHash) => {
+                        this.transactionHash = txHash;
+                        resolve({ txHash });
+                    });
+                } else {
+                    response.on('receipt', (receipt) => {
                         this.setAddress(receipt.contractAddress);
                         this.transactionHash = receipt.transactionHash;
                         this.receipt = receipt;
-                        resolve(receipt);
-                    })
-                    .on('error', reject)
+                        resolve({ receipt });
+                    });
+                }
+                response.on('error', reject);
             } catch (err) {
                 reject(err);
             }
@@ -152,6 +182,7 @@ module.exports = class Contract {
      * @param {*} address : Address of the deployed contract
      */
     setAddress(address) {
+        this.contractAddress = address;
         this.instance.options.address = address;
     }
 
@@ -181,8 +212,9 @@ module.exports = class Contract {
      * @param {*} functionName : The name of the function
      * @param {*} args : Arguments to pass to function if any
      * @param {*} value : Ether to send if the function is payable
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
-    set(functionName, args, options) {
+    set(functionName, args, options, isTxHashOnly) {
         let sendParmas = {
             from: this.address
         }
@@ -192,17 +224,17 @@ module.exports = class Contract {
         }
 
         return new Promise((resolve, reject) => {
-
-            this.instance.methods[functionName].apply(null, args).send(sendParmas, (error, transactionHash) => {
-                if (error) {
-                    reject(error)
-                }
-            })
-                .on('confirmation', (confirmationNumber, receipt) => {
-                    resolve(receipt);
+            const response = this.instance.methods[functionName].apply(null, args).send(sendParmas);
+            if (isTxHashOnly) {
+                response.on('transactionHash', (txHash) => {
+                    resolve({ txHash });
+                });
+            } else {
+                response.on('receipt', (receipt) => {
+                    resolve({ receipt });
                 })
-                .on('error', reject)
-
+            }
+            response.on('error', reject);
         })
     }
 
@@ -221,21 +253,101 @@ module.exports = class Contract {
      * @param {*} functionName : Name of the function to call
      * @param {*} args : Arguments to pass to function
      * @param {*} options : Any options like gas price, gas, value, etc
+     * @param {*} isTxHashOnly : Flag to resolve one txHash is available instead of waiting till transaction is confirmed and receipts available
      */
-    signedTxFunctionCall(functionName, args, options) {
+    signedTxFunctionCall(functionName, args, options, isTxHashOnly) {
         options['to'] = this.instance.options.address;
         return new Promise(async (resolve, reject) => {
             try {
                 const encoded = this.getFunctionEncoded(functionName, args);
                 const txData = await this.signTx(encoded, options);
-                this.web3.eth.sendSignedTransaction(txData)
-                    .on('confirmation', (confirmationNumber, receipt) => {
-                        resolve(receipt);
-                    })
-                    .on('error', reject)
+                const response = this.web3.eth.sendSignedTransaction(txData);
+                if (isTxHashOnly) {
+                    response.on('transactionHash', (txHash) => {
+                        resolve({ txHash });
+                    });
+                } else {
+                    response.on('receipt', (receipt) => {
+                        resolve({ receipt });
+                    });
+                }
+                response.on('error', reject);
             } catch (err) {
                 reject(err);
             }
         })
     }
+
+    /**
+     * Returns receipt with decoded transaction log
+     * @param {*} hash Transaction Hash
+     */
+    getReceipt(hash) {
+        return new Promise((resolve, reject) => {
+            this.web3.eth.getTransactionReceipt(hash).then((data) => {
+                try {
+
+                    const decodedLogs = abiDecoder.decodeLogs(data.logs);
+                    console.log(JSON.stringify(decodedLogs))
+                    if (data.logs !== null)
+                        data.logs = data.logs.map(value => {
+                            if (this.hashMap[value.topics[0]]) {
+                                const topics = value.topics;
+                                value.decodedTopic = this.hashMap[topics[0]].name;
+                                const inputs = this.hashMap[value.topics[0]].inputs;
+                                const decoded = this.web3.eth.abi.decodeLog(inputs, value.data);
+                                value.decodedParams = {};
+                                let topicCount = 0;
+                                for (let i = 0; i < inputs.length; i++) {
+                                    if (inputs[i].indexed === true && topicCount < topics.length) {
+                                        value.decodedParams[inputs[i].name] = topics[++topicCount];
+                                    } else {
+                                        value.decodedParams[inputs[i].name] = decoded[inputs[i].name];
+                                    }
+                                }
+                            }
+                            return value;
+                        })
+                    resolve(data);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    /**
+     * Returns receipt with decoded transaction log
+     * @param {*} hash Transaction Hash
+     */
+    getTransaction(hash) {
+        return new Promise((resolve, reject) => {
+            this.web3.eth.getTransaction(hash).then((data) => {
+                try {
+                    data.logs = data.logs.map(value => {
+                        if (this.hashMap[value.topics[0]]) {
+                            const topics = value.topics;
+                            value.decodedTopic = this.hashMap[topics[0]].name;
+                            const inputs = this.hashMap[value.topics[0]].inputs;
+                            const decoded = this.web3.eth.abi.decodeLog(inputs, value.data);
+                            value.decodedParams = {};
+                            let topicCount = 0;
+                            for (let i = 0; i < inputs.length; i++) {
+                                if (inputs[i].indexed === true && topicCount < topics.length) {
+                                    value.decodedParams[inputs[i].name] = topics[++topicCount];
+                                } else {
+                                    value.decodedParams[inputs[i].name] = decoded[inputs[i].name];
+                                }
+                            }
+                        }
+                        return value;
+                    })
+                    resolve(data);
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        });
+    }
+
 }
