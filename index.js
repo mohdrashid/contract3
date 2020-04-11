@@ -81,7 +81,7 @@ module.exports = class contract3 {
           resolve({
             instance: contract,
             transactionHash: contract.getTransactionHash(),
-            receipt: contract.getReceipt()
+            receipt: data
           }
           );
         })
