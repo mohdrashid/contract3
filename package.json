@@ -1,6 +1,6 @@
 {
   "name": "contract3",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "A plugin making smart contract compilation, deployment and interaction easier",
   "main": "index.js",
   "scripts": {
@@ -18,13 +18,16 @@
     "smart",
     "contract",
     "blockchain",
-    "ethereum"
+    "ethereum",
+    "quorum",
+    "contract3"
   ],
   "bugs": {
     "url": "https://github.com/mohdrashid/contract3/issues"
   },
   "homepage": "https://github.com/mohdrashid/contract3#readme",
   "dependencies": {
-    "ethereumjs-tx": "^2.1.2"
+    "ethereumjs-tx": "^2.1.2",
+    "abi-decoder": "^2.3.0"
   }
 }

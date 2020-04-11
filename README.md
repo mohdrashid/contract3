@@ -180,11 +180,13 @@ Use this method to get instance of pre-compiled smart contract (Does not work if
 ```
 ## Contract Instance methods
 
-### deployContract(args, options)
+### deployContract(args, options, isTxHashOnly)
 Deploys the contract as a singed transaction. Deploys the contract and creates an instances using args passed as array. 
 1. `args` are arguments to be passed to constructor
 2. `options` contains standard web3 options like gas, value, etc. 
+3. `isTxHashOnly` Optional Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
 
+Returns transaction reciept if isTxHashOnly is false or undefined else gives back transaction hash
 
 ```javascript
     let Administered = 'contract Administered { .. }';
@@ -221,10 +223,13 @@ Interface to get encoded transaction data for contact deployment
     console.log(contractInstance.deployContractEncoded([]));
 ```
 
-### signedTxDeployContract(args, options) 
+### signedTxDeployContract(args, options, isTxHashOnly) 
 Deploys the contract as a singed transaction. 
 1. `args` are arguments to be passed to constructor
 2. `options` contains standard web3 options like gas, value, etc. 
+3. `isTxHashOnly` Optional Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
+
+Returns transaction reciept if isTxHashOnly is false or undefined else gives back transaction hash
 
 ```javascript
     const abi ={..};
@@ -254,13 +259,14 @@ A getter function that issue a call to function represented by functionName by p
     console.log(result)
 ```
 
-### set(functionName,args,options)
+### set(functionName,args,options, isTxHashOnly)
 Set is used to perform send transactions on functions of a deployed smart contract. 
 1. `functionName` Smart contract function name
 2. `args` are arguments to be passed to constructor. Its a array so multiple arguments can be passed dynamically
 3. `options` contains standard web3 options like gas, value, etc. 
+3. `isTxHashOnly` Optional Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
 
-Returns transaction reciept
+Returns transaction reciept if isTxHashOnly is false or undefined else gives back transaction hash
 
 ```javascript
     const result2 = await contracts.set(ContractObject,'set', [134],{gas: 100000});
@@ -272,13 +278,14 @@ Returns transaction reciept
 
 
 
-### signedTxFunctionCall(functionName, args, options) 
+### signedTxFunctionCall(functionName, args, options, isTxHashOnly) 
 Deploys the contract as a singed transaction.
 1. `functionName` Smart contract function name
 2. `args` are arguments to be passed to constructor
 3. `options` contains standard web3 options like gas, value, etc. 
+3. `isTxHashOnly` Optional Flag to resolve once txHash is available instead of waiting till transaction is confirmed and receipts available
 
-Returns transaction reciept
+Returns transaction reciept if isTxHashOnly is false or undefined else gives back transaction hash
 
 ```javascript
     const abi ={..};
@@ -300,7 +307,7 @@ Returns encoded value for a function to use for sending signed transaction
     console.log(contractInstance.getFunctionEncoded("get",[]));
 ```
 
-### getReceipt()
+### getTranactionReceipt()
 Returns transaction receipt assosciated with contract deployment
 
 ### getCode()
@@ -309,7 +316,19 @@ Returns bytecode of the contract
 ### getInstance()
 Returns web3 contract instance of the instance
 
+### getReceipt(hash)
+1. `hash` Transaction Hash
+
+Returns receipt with decoded transaction log
 
 
-## Full example
-To see a full example visit [link](https://github.com/mohdrashid/ethereum_asset_exchange_example)
+### getReceipt(hash)
+1. `hash` Transaction Hash
+
+Returns receipt with decoded transaction log
+
+
+### getTransaction(hash)
+1. `hash` Transaction Hash
+
+Returns transaction data with decoded input
