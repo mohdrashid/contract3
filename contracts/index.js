@@ -10,8 +10,9 @@ module.exports = class Contract {
      * @param {*} address : Ethreum Address
      * @param {*} privateKey : Private Key (Needed only if using signed transactions)
      * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value (Needed only if using signed transactions)
+     * @param {*} chainConfig chain config for etherumjs-tx module  => eg. { chain: 'mainnet', hardfork: 'petersburg' } . ONly required if signed transactions are used
      */
-    constructor(web3, abi, code, address, privateKey, nonceFetchFlag) {
+    constructor(web3, abi, code, address, privateKey, nonceFetchFlag, chainConfig) {
         this.web3 = web3;
         abiDecoder.addABI(abi);
         this.instance = new this.web3.eth.Contract(abi);
@@ -21,6 +22,7 @@ module.exports = class Contract {
         if (privateKey) {
             this.privateKey = privateKey;
             this.nonceFetchFlag = nonceFetchFlag;
+            this.chainConfig = chainConfig;
         }
         this.contractAddress = undefined;
         this.transactionHash = undefined;
@@ -121,7 +123,7 @@ module.exports = class Contract {
             options['nonce'] = await this.web3.eth.getTransactionCount(this.address, 'pending');
         }
         options['data'] = encoded;
-        const tx = new Tx(options, { 'chain': 'ropsten' });
+        const tx = new Tx(options, this.chainConfig);
         tx.sign(this.privateKey);
         const serializedTx = tx.serialize();
         const final = '0x' + serializedTx.toString('hex');

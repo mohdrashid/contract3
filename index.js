@@ -7,13 +7,15 @@ module.exports = class contract3 {
    * @param {*} address : Ethreum Address
    * @param {*} privateKey : Private Key (Needed only if using signed transactions)
    * @param {*} nonceFetchFlag : Set this flag to automatically fetch the current nonce value (Needed only if using signed transactions)
+   * @param {*} chainConfig chain config for etherumjs-tx plugin  => eg. { chain: 'mainnet', hardfork: 'petersburg' } . ONly required if signed transactions are used
    */
-  constructor(web3, address, privateKey, nonceFetchFlag) {
+  constructor(web3, address, privateKey, nonceFetchFlag, chainConfig) {
     this.web3 = web3;
     this.address = address;
     if (privateKey) {
       this.privateKey = new Buffer(privateKey, 'hex');
     }
+    this.chainConfig = chainConfig
     this.nonceFetchFlag = nonceFetchFlag;
   }
 
@@ -41,7 +43,7 @@ module.exports = class contract3 {
    * @param {*} options : Other options like privateFor, value, gas, gasPrice, etc
    */
   deploy(abi, code, args, options) {
-    const contract = new Contract(this.web3, abi, code, this.address, this.privateKey, this.nonceFetchFlag);
+    const contract = new Contract(this.web3, abi, code, this.address, this.privateKey, this.nonceFetchFlag, this.chainConfig);
     return new Promise(function (resolve, reject) {
       contract
         .deployContract(args, options)
@@ -73,7 +75,7 @@ module.exports = class contract3 {
         message: "Private key cannot be null for a signed transaction. Please initialize constructor with a proper private key"
       }))
     }
-    const contract = new Contract(this.web3, abi, code, this.address, this.privateKey, this.nonceFetchFlag);
+    const contract = new Contract(this.web3, abi, code, this.address, this.privateKey, this.nonceFetchFlag, this.chainConfig);
     return new Promise(function (resolve, reject) {
       contract
         .signedTxDeployContract(args, options)
@@ -109,7 +111,7 @@ module.exports = class contract3 {
       const bytecode = compiled[i]["bytecode"];
       const abi = JSON.parse(compiled[i]["interface"]);
       compiledInstances[name] = () => {
-        return new new Contract(this.web3, abi, bytecode, this.address, this.privateKey, this.nonceFetchFlag);
+        return new new Contract(this.web3, abi, bytecode, this.address, this.privateKey, this.nonceFetchFlag, this.chainConfig);
       };
     }
     return compiledInstances;
@@ -121,7 +123,7 @@ module.exports = class contract3 {
    * @param {*} address : Address of any exitsting contract
    */
   getInstance(abi, address) {
-    let c = new Contract(this.web3, abi, "", this.address, this.privateKey, this.nonceFetchFlag);
+    let c = new Contract(this.web3, abi, "", this.address, this.privateKey, this.nonceFetchFlag, this.chainConfig);
     c.setAddress(address);
     return c;
   }

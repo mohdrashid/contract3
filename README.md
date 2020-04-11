@@ -70,7 +70,7 @@ This method is useful for consuming apis of services like infura to interact wit
     const Web3 = require('web3');
     const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
     const Contract3 = require('contract3');
-    let contract3 = new Contract3(web3, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/, "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/);
+    let contract3 = new Contract3(web3, "0x4E5feB13de0e29BC4aeA01........"/*Ethereum_Address*/, "dfae4457ef0fd39416597da2fab6739..........."/*Private_Key*/, true/*Automatically fetch current nonce flag*/, {chain: 'ropstein'});
     const abi ={..};
     const contractInstance = await contract3.getInstance(abi);
     //Deploying contrcat
@@ -91,12 +91,13 @@ For calling contract methods as signed tx refer to "Contract Instance methods" s
 
 ## Class functions
 
-### constructor(web3, address, privateKey, nonceFetchFlag)
+### constructor(web3, address, privateKey, nonceFetchFlag, chainConfig)
 Constructor takes web3 object as argument. 
 1. `web3` a intialized web3 instance
 2. `address` is the ethereum account address 
 3. `privateKey` is the private key to be used for signing transaction. 
 4. `nonceFetchKey` is an optional flag to automatically fetch latest transaction count of the account
+5. `chainConfig` is chainConfig chain config for etherumjs-tx module  => eg. { chain: 'mainnet', hardfork: 'petersburg' } . Only required if signed transactions are used account
 
 ```javascript
 /*Pre Requisite*/
