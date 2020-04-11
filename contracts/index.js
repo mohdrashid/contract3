@@ -271,7 +271,9 @@ module.exports = class Contract {
         return new Promise((resolve, reject) => {
             this.web3.eth.getTransactionReceipt(hash).then((data) => {
                 try {
-                    data.decodedLogs = abiDecoder.decodeLogs(data.logs);
+                    if(data.logs){
+                        data.decodedLogs = abiDecoder.decodeLogs(data.logs);
+                    }
                     resolve(data);
                 } catch (err) {
                     reject(err);
@@ -288,7 +290,9 @@ module.exports = class Contract {
         return new Promise((resolve, reject) => {
             this.web3.eth.getTransaction(hash).then((data) => {
                 try {
-                    data.decodedInputs = abiDecoder.decodeMethod(data.input);
+                    if(data.input){
+                        data.decodedInputs = abiDecoder.decodeMethod(data.input);
+                    }
                     resolve(data);
                 } catch (err) {
                     reject(err);
